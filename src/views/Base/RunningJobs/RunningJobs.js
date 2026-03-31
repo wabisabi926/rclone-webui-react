@@ -8,6 +8,7 @@ import {CustomTooltips} from "@coreui/coreui-plugin-chartjs-custom-tooltips";
 import axiosInstance from "../../../utils/API/API";
 import urls from "../../../utils/API/endpoint";
 import {toast} from "react-toastify";
+import { withTranslation, useTranslation } from 'react-i18next';
 
 const options = {
     tooltips: {
@@ -29,19 +30,20 @@ const options = {
     }
 };
 function JobCard({job}) {
+    const { t } = useTranslation();
     const {name, eta, percentage, speed, speedAvg, size, bytes} = job;
     if (name && !isNaN(speed)) {
 
         return (<Card>
-            <CardHeader>Running Jobs</CardHeader>
+            <CardHeader>{t('runningJobs.currentJobs')}</CardHeader>
             <CardBody>
                 <p>{name}</p> {/*Name of the file*/}
                 <Progress value={percentage} className={"mb-2"}>{percentage} %</Progress> {/*percentage*/}
-                <p><strong>Speed: </strong>{formatBytes(speed)}PS</p> {/*speed*/}
+                <p><strong>{t('runningJobs.transferSpeed')}: </strong>{formatBytes(speed)}PS</p> {/*speed*/}
                 <p><strong>Average Speed: </strong>{formatBytes(speedAvg)}PS</p> {/*speedAvg*/}
-                <p><strong>Total transferred: </strong>{formatBytes(bytes)}</p> {/*bytes: convert to mb*/}
+                <p><strong>{t('runningJobs.transferred')}: </strong>{formatBytes(bytes)}</p> {/*bytes: convert to mb*/}
                 <p><strong>Size: </strong>{formatBytes(size)}</p>
-                <p><strong>ETA: </strong>{secondsToStr(eta)}</p>
+                <p><strong>{t('runningJobs.eta')}: </strong>{secondsToStr(eta)}</p>
             </CardBody>
 
         </Card>);
@@ -87,44 +89,44 @@ function JobCardRow({job}) {
 
 }
 
-function GlobalStatus({stats}) {
+function GlobalStatus({stats, t}) {
     const {speed, bytes, checks, elapsedTime, deletes, errors, transfers, lastError} = stats;
     return (
         <Card>
-            <CardHeader><strong>Global Stats</strong></CardHeader>
+            <CardHeader><strong>{t('runningJobs.globalStats')}</strong></CardHeader>
             <CardBody>
                 <table className="table">
                     <tbody>
                     <tr>
-                        <td className="card-subtitle">Bytes Transferred:</td>
+                        <td className="card-subtitle">{t('runningJobs.bytesTransferred')}:</td>
                         <td className="card-text">{formatBytes(bytes)}</td>
                     </tr>
                     <tr>
-                        <td className="card-subtitle">Average Speed:</td>
+                        <td className="card-subtitle">{t('runningJobs.averageSpeed')}:</td>
                         <td className="card-text">{formatBytes(speed)}PS</td>
                     </tr>
                     <tr>
-                        <td className="card-subtitle">Checks:</td>
+                        <td className="card-subtitle">{t('runningJobs.checks')}:</td>
                         <td className="card-text">{checks}</td>
                     </tr>
                     <tr>
-                        <td className="card-subtitle">Deletes:</td>
+                        <td className="card-subtitle">{t('runningJobs.deletes')}:</td>
                         <td className="card-text">{deletes}</td>
                     </tr>
                     <tr>
-                        <td className="card-subtitle">Running since:</td>
+                        <td className="card-subtitle">{t('runningJobs.runningSince')}:</td>
                         <td className="card-text">{secondsToStr(elapsedTime)}</td>
                     </tr>
                     <tr className={errors > 0 ? "table-danger" : ""}>
-                        <td className="card-subtitle">Errors:</td>
+                        <td className="card-subtitle">{t('runningJobs.errors')}:</td>
                         <td className="card-text">{errors}</td>
                     </tr>
                     <tr>
-                        <td className="card-subtitle">Transfers:</td>
+                        <td className="card-subtitle">{t('runningJobs.transfers')}:</td>
                         <td className="card-text">{transfers}</td>
                     </tr>
                     <tr>
-                        <td className="card-subtitle">Last Error:</td>
+                        <td className="card-subtitle">{t('runningJobs.lastError')}:</td>
                         <td className="card-text">{lastError}</td>
                     </tr>
 
@@ -165,6 +167,7 @@ function TransferringJobsRow({transferring}) {
 }
 
 function JobGroup({job, groupId}) {
+    const { t } = useTranslation();
     const [showCollapse, setShowCollapse] = useState(false);
     const [cancelButtonEnabled, setCancelButtonEnabled] = useState(true);
 
@@ -174,9 +177,9 @@ function JobGroup({job, groupId}) {
             setCancelButtonEnabled(false);
             const jobid = groupId.split('/')[1];
             axiosInstance.post(urls.stopJob, {jobid, _async:true}).then(function (res) {
-                toast.info(`Job ${jobid} stopped`);
+                toast.info(`${t('runningJobs.job')} ${jobid} stopped`);
             }).catch(err => {
-                toast.error(`Job ${jobid} couldn't be stopped`)
+                toast.error(`${t('runningJobs.job')} ${jobid} couldn't be stopped`)
             })
         }
     };
@@ -191,7 +194,7 @@ function JobGroup({job, groupId}) {
                         <Container>
                             <Row>
                                 <Col sm={10}>
-                                    Transferring {job.length} file(s)
+                                    {t('runningJobs.transferring')} {job.length} file(s)
                                 </Col>
                                 <Col sm={2}>
                                     <Button color={"light"} disabled={!cancelButtonEnabled}
@@ -242,7 +245,7 @@ class RunningJobs extends React.Component {
 
 
     render() {
-        const {jobs, isConnected, lineChartData} = this.props;
+        const {jobs, isConnected, lineChartData, t} = this.props;
         const {transferring} = jobs;
         const {mode} = this.props;
         if (mode === "full-status") {
@@ -250,13 +253,13 @@ class RunningJobs extends React.Component {
                 return (
                     <Row>
                         <Col sm={12} lg={6}>
-                            <GlobalStatus stats={jobs}/>
+                            <GlobalStatus stats={jobs} t={t}/>
                         </Col>
 
                         <Col sm={12} lg={6}>
                             <Card>
                                 <CardHeader>
-                                    Speed
+                                    {t('runningJobs.speed')}
                                 </CardHeader>
                                 <CardBody>
                                     <div className="chart-wrapper">
@@ -271,7 +274,7 @@ class RunningJobs extends React.Component {
                     </Row>
                 );
             } else {
-                return (<div>Not connected to rclone.</div>)
+                return (<div>{t('runningJobs.notConnected')}</div>)
             }
 
         } else if (mode === "card") {
@@ -280,14 +283,15 @@ class RunningJobs extends React.Component {
                     <TransferringJobsRow transferring={transferring}/>
                 );
             } else {
-                return (<div>Not connected to rclone.</div>);
+                return (<div>{t('runningJobs.notConnected')}</div>);
             }
 
         } else if (mode === "modal") {
             if (transferring && transferring.length > 0)
                 return (
                     <Card className="progress-modal d-none d-sm-block">
-                        <CardHeader onClick={() => this.toggleShowing()}>Progress
+                        <CardHeader onClick={() => this.toggleShowing()}>
+                            {t('runningJobs.progress')}
                             <div className="card-header-actions">
                                 <Button color="link">
                                     <i className="fa fa-close fa-lg"/>
@@ -388,4 +392,4 @@ const mapStateToProps = (state, ownProps) => {
     }
 };
 
-export default connect(mapStateToProps, {})(RunningJobs);
+export default withTranslation()(connect(mapStateToProps, {})(RunningJobs));

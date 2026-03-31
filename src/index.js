@@ -8,6 +8,8 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {Provider} from "react-redux";
 import store from './store';
+// 导入i18n配置
+import './i18n';
 
 ReactDOM.render(
     <Provider store={store}>

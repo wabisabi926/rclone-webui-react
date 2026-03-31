@@ -21,6 +21,7 @@ import routes from '../../routes';
 import {connect} from "react-redux";
 import {AUTH_KEY, LOGIN_TOKEN} from "../../utils/Constants";
 import ErrorBoundary from "../../ErrorHandling/ErrorBoundary";
+import { withTranslation } from 'react-i18next';
 
 // const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
@@ -38,9 +39,13 @@ class DefaultLayout extends Component {
     loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>;
 
     get navConfig() {
+        const { t } = this.props;
         return {
             items: [
-                ...navigation.items,
+                ...navigation.items.map(item => ({
+                    ...item,
+                    name: t(item.name)
+                })),
                 {
                     name: this.props.version.version,
                     ...VERSION_NAV_ITEM_ATTRS
@@ -120,4 +125,4 @@ const mapStateToProps = (state) => ({
     version: state.version,
 });
 
-export default connect(mapStateToProps, { getVersion })(DefaultLayout);
+export default withTranslation()(connect(mapStateToProps, { getVersion })(DefaultLayout));

@@ -6,6 +6,7 @@ import {connect} from "react-redux";
 import {getBandwidth, setBandwidth} from "../../../actions/statusActions";
 import * as PropTypes from "prop-types";
 import {PROP_BANDWIDTH} from "../../../utils/RclonePropTypes";
+import { withTranslation } from 'react-i18next';
 
 
 class BandwidthStatusCard extends React.Component {
@@ -93,33 +94,33 @@ class BandwidthStatusCard extends React.Component {
 
     render() {
         const {bandwidthText, hasError, showChangeBandwidth} = this.state;
-        const {bandwidth} = this.props;
+        const {bandwidth, t} = this.props;
 
 
         return ( 
         <Card>
             <CardHeader>
-                Bandwidth <button className="btn btn-white float-right" onClick={this.toggleShowChangeBandwidth}>Modify</button>
+                {t('bandwidth.title')} <button className="btn btn-white float-right" onClick={this.toggleShowChangeBandwidth}>{t('bandwidth.modify')}</button>
             </CardHeader>
             <CardBody>
                 <p>
-                    <span className="card-subtitle">Current Max speed: {"  "}</span> 
-                    <span className="card-text">{(bandwidth.rate !== "off") ? bandwidth.rate : "Unlimited"}</span>
+                    <span className="card-subtitle">{t('bandwidth.currentMaxSpeed')}</span> 
+                    <span className="card-text">{(bandwidth.rate !== "off") ? bandwidth.rate : t('bandwidth.unlimited')}</span>
                 </p>
                 <Form onSubmit={this.setBandwidth} className={showChangeBandwidth ? "" : "d-none"}>
                     <FormGroup row>
-                        <Label for="bandwidthValue" sm={5}>Enter new max speed (upload:download)</Label>
+                        <Label for="bandwidthValue" sm={5}>{t('bandwidth.enterNewMaxSpeed')}</Label>
                         <Col sm={7}>
                             <Input type="text" value={bandwidthText}
                                     valid={!hasError} invalid={hasError}
                                     id="bandwidthValue" onChange={this.changeBandwidthInput}>
                             </Input>
-                            <FormFeedback valid>Keep empty to reset.</FormFeedback>
-                            <FormFeedback>The bandwidth should be of the form 1M|2M|1G|1K|1.1K etc. Can also be specified as (upload:download)</FormFeedback>
+                            <FormFeedback valid>{t('bandwidth.keepEmptyToReset')}</FormFeedback>
+                            <FormFeedback>{t('bandwidth.bandwidthError')}</FormFeedback>
 
                         </Col>
                     </FormGroup>
-                    <Button className="float-right" color="success" type="submit">Set</Button>
+                    <Button className="float-right" color="success" type="submit">{t('bandwidth.set')}</Button>
 
                 </Form>
                 
@@ -156,4 +157,4 @@ BandwidthStatusCard.propTypes = {
 
 };
 
-export default connect(mapStateToProps, {getBandwidth, setBandwidth})(BandwidthStatusCard)
+export default withTranslation()(connect(mapStateToProps, {getBandwidth, setBandwidth})(BandwidthStatusCard))

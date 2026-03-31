@@ -1,12 +1,14 @@
 import React, {Component} from 'react';
 import {NavLink} from 'react-router-dom';
-import {Nav, NavItem} from 'reactstrap';
+import {Nav, NavItem, NavLink as NavLinkStrap} from 'reactstrap';
 import PropTypes from 'prop-types';
 
 import {AppNavbarBrand, AppSidebarToggler} from '@coreui/react';
 import logo from '../../assets/img/brand/logo.png'
 import favicon from '../../assets/img/brand/favicon.png'
 import BackendStatusCard from "../../views/Base/BackendStatusCard/BackendStatusCard";
+import { withTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 
 const propTypes = {
     children: PropTypes.node,
@@ -15,10 +17,18 @@ const propTypes = {
 const defaultProps = {};
 
 class DefaultHeader extends Component {
+    // 切换语言
+    toggleLanguage = () => {
+        const currentLanguage = i18n.language;
+        const newLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+        i18n.changeLanguage(newLanguage);
+    };
+
     render() {
 
         // eslint-disable-next-line
         const {children, ...attributes} = this.props;
+        const currentLanguage = i18n.language;
 
         return (
             <React.Fragment>
@@ -36,6 +46,12 @@ class DefaultHeader extends Component {
 
                 </Nav>
                 <Nav className="ml-auto" navbar>
+                    <NavItem>
+                        <NavLinkStrap onClick={this.toggleLanguage} className="nav-link">
+                            <i className="fa fa-globe mr-1"></i>
+                            {currentLanguage === 'zh' ? 'English' : '中文'}
+                        </NavLinkStrap>
+                    </NavItem>
                     <BackendStatusCard mode={"button"}/>
                 </Nav>
 
@@ -47,4 +63,4 @@ class DefaultHeader extends Component {
 DefaultHeader.propTypes = propTypes;
 DefaultHeader.defaultProps = defaultProps;
 
-export default DefaultHeader;
+export default withTranslation()(DefaultHeader);

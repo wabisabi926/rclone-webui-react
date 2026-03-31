@@ -1,35 +1,52 @@
-export default {
+import { useTranslation } from 'react-i18next';
+
+// 导航菜单配置
+const navConfig = {
     items: [
         {
-            name: 'Dashboard',
+            name: 'nav.dashboard',
             url: '/dashboard',
             icon: 'icon-speedometer'
         },
         {
-            name: 'Configs',
+            name: 'nav.configs',
             url: '/showconfig',
             icon: 'icon-note'
         },
         {
-            name: 'Explorer',
+            name: 'nav.explorer',
             url: '/remoteExplorer',
             icon: 'icon-screen-desktop'
         },
         {
-            name: 'Backend',
+            name: 'nav.backend',
             url: '/rcloneBackend',
             icon: 'icon-star',
         },
         {
-            name: 'Mounts',
+            name: 'nav.mounts',
             url: '/mountDashboard',
             icon: 'fa fa-hdd-o'
         },
         {
-            name: 'Log Out',
+            name: 'nav.logout',
             url: '/login',
             icon: 'icon-logout',
         },
 
     ],
 };
+
+// 导航菜单组件
+export const NavMenu = () => {
+    const { t } = useTranslation();
+    
+    return {
+        items: navConfig.items.map(item => ({
+            ...item,
+            name: t(item.name)
+        }))
+    };
+};
+
+export default navConfig;

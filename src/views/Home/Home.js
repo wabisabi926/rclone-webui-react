@@ -6,29 +6,27 @@ import BandwidthStatusCard from "../Base/BandwidthStatusCard/BandwidthStatusCard
 import {connect} from "react-redux";
 import * as PropTypes from 'prop-types';
 import {IP_ADDRESS_KEY} from "../../utils/Constants";
+import { useTranslation } from 'react-i18next';
 
-class Home extends React.Component {
+const Home = ({ checkStatus }) => {
+    const { t } = useTranslation();
+    const ipAddress = localStorage.getItem(IP_ADDRESS_KEY);
+    
+    return (
+        <div data-test="homeComponent">
+            <Row>
+                <Col lg={6} sm={12}>
+                    <BackendStatusCard ipAddress={ipAddress} mode={"card"}/>
+                </Col>
+                <Col lg={6} sm={12}>
+                    <BandwidthStatusCard/>
+                </Col>
+            </Row>
+            <h2>{t('home.jobs')}</h2>
+            {checkStatus ? <RunningJobs mode={"full-status"}/> : <p>{t('home.notMonitoring')}</p>}
 
-
-    render() {
-        const {checkStatus} = this.props;
-        const ipAddress = localStorage.getItem(IP_ADDRESS_KEY);
-        return (
-            <div data-test="homeComponent">
-                <Row>
-                    <Col lg={6} sm={12}>
-                        <BackendStatusCard ipAddress={ipAddress} mode={"card"}/>
-                    </Col>
-                    <Col lg={6} sm={12}>
-                        <BandwidthStatusCard/>
-                    </Col>
-                </Row>
-                <h2>Jobs</h2>
-                {checkStatus ? <RunningJobs mode={"full-status"}/> : <p>Not Monitoring</p>}
-
-            </div>);
-    }
-}
+        </div>);
+};
 
 const mapStateToProps = state => ({
     checkStatus: state.status.checkStatus

@@ -6,6 +6,7 @@ import RunningJobs from "../RunningJobs";
 import {connect} from "react-redux";
 import {enableCheckStatus, getStatus} from "../../../actions/statusActions";
 import {IP_ADDRESS_KEY, MODAL_ROOT_ELEMENT, STATUS_REFRESH_TIMEOUT, USER_NAME_KEY} from "../../../utils/Constants";
+import { withTranslation } from 'react-i18next';
 
 /**
  * Functional component Modal which is placed in the element with id "modal-root" in index.html using React.createPortal
@@ -54,7 +55,7 @@ class BackendStatusCard extends React.Component {
      * @returns {*}
      */
     render() {
-        const {isConnected, mode, checkStatus} = this.props;
+        const {isConnected, mode, checkStatus, t} = this.props;
 
         const ipAddress = localStorage.getItem(IP_ADDRESS_KEY);
         const username = localStorage.getItem(USER_NAME_KEY);
@@ -66,11 +67,11 @@ class BackendStatusCard extends React.Component {
                 <Card
                     className={"text-center " + (isConnected ? "card-accent-info" : "card-accent-warning")}>
                     <CardHeader>
-                        Overview
+                        {t('backendStatus.overview')}
                     </CardHeader>
                     <CardBody>
                         <StatusText checkStatus={checkStatus} connectivityStatus={isConnected} ipAddress={ipAddress}
-                                    userName={username}/>
+                                    userName={username} t={t}/>
 
                     </CardBody>
                 </Card>
@@ -79,7 +80,9 @@ class BackendStatusCard extends React.Component {
             return (
                 <React.Fragment>
                     <Button type="primary" onClick={this.toggleCheckStatus}
-                            className={isConnected ? "bg-info  d-none d-lg-block" : "bg-warning d-none d-lg-block"}> {checkStatus ? isConnected ? "CONNECTED" : "DISCONNECTED" : "DISABLED"}</Button>
+                            className={isConnected ? "bg-info  d-none d-lg-block" : "bg-warning d-none d-lg-block"}> 
+                        {checkStatus ? isConnected ? t('backendStatus.connectedButton') : t('backendStatus.disconnectedButton') : t('backendStatus.disabledButton')}
+                    </Button>
                     {/*Show current tasks in the side modal*/}
                     <TaskModal/>
                 </React.Fragment>
@@ -96,33 +99,33 @@ class BackendStatusCard extends React.Component {
  * @returns {*}
  * @constructor
  */
-function StatusText({connectivityStatus, checkStatus, ipAddress, userName}) {
+function StatusText({connectivityStatus, checkStatus, ipAddress, userName, t}) {
 
     let statusText = "";
     if(!checkStatus){
-        statusText = "Not monitoring connectivity status. Tap the icon in navbar to start.";
+        statusText = t('backendStatus.notMonitoring');
     }else if(connectivityStatus){
         // Connected to backend
-        statusText = "rClone Backend is connected and working as expected";
+        statusText = t('backendStatus.connected');
     }else{
-        statusText = "Cannot connect to rclone backend. There is a problem with connecting to {ipAddress}."
+        statusText = t('backendStatus.disconnected', { ipAddress });
     }
 
     return (
-        <>
+        <div>
             <p>
-                <span className={"card-subtitle"}>Status: {" "}</span>
+                <span className="card-subtitle">{t('backendStatus.status')}</span>
                 <span className="card-text">{statusText}</span>
             </p>
             <p>
-                <span className={"card-subtitle"}>Current IP Address: {" "}</span>
+                <span className="card-subtitle">{t('backendStatus.currentIp')}</span>
                 <span className="card-text">{ipAddress}</span>
             </p>
             <p>
-                <span className={"card-subtitle"}>Username: {" "}</span>
+                <span className="card-subtitle">{t('backendStatus.username')}</span>
                 <span className="card-text">{userName}</span>
             </p>
-        </>
+        </div>
     )
 }
 
@@ -165,4 +168,4 @@ const mapStateToProps = state => ({
     checkStatus: state.status.checkStatus
 });
 
-export default connect(mapStateToProps, {getStatus, enableCheckStatus})(BackendStatusCard);
+export default withTranslation()(connect(mapStateToProps, {getStatus, enableCheckStatus})(BackendStatusCard));
